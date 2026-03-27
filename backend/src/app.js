@@ -11,6 +11,7 @@ const footballRouter = require('./routes/football');
 const cricketRouter = require('./routes/cricket');
 const healthRouter = require('./routes/health');
 const webhookRouter = require('./routes/webhooks');
+const livescoreRouter = require('./routes/livescore');
 const pollingService = require('./services/pollingService');
 const mockScoreService = require('./services/mockScoreService');
 
@@ -70,6 +71,7 @@ app.use('/health', healthRouter);
 // API Routes
 app.use('/api/football', footballRouter);
 app.use('/api/cricket', cricketRouter);
+app.use('/api/livescore', livescoreRouter);
 
 // Webhooks
 app.use('/webhooks/sportmonks', webhookRouter);
