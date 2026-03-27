@@ -102,6 +102,112 @@ class SportmonksClient {
   }
 
   /**
+   * Search cricket teams by name
+   */
+  async searchCricketTeams(teamName) {
+    try {
+      const response = await this.client.get('/v3/cricket/teams/search/' + encodeURIComponent(teamName), {
+        params: {
+          api_token: this.apiKey
+        }
+      });
+
+      return {
+        data: response.data.data || [],
+        rateLimit: this.extractRateLimit(response.headers),
+        timestamp: Date.now()
+      };
+
+    } catch (error) {
+      console.error(`❌ Error searching cricket team "${teamName}":`, error.message);
+      throw error;
+    }
+  }
+
+  /**
+   * Get upcoming IPL cricket fixtures (next 2 days)
+   */
+  async getUpcomingCricketFixtures() {
+    try {
+      const today = new Date();
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1);
+      const dayAfter = new Date(today);
+      dayAfter.setDate(today.getDate() + 2);
+
+      const startDate = tomorrow.toISOString().split('T')[0];
+      const endDate = dayAfter.toISOString().split('T')[0];
+
+      const response = await this.client.get('/v3/cricket/fixtures/between/' + startDate + '/' + endDate, {
+        params: {
+          api_token: this.apiKey,
+          include: 'localTeam,visitorTeam,score,league',
+          per_page: 50
+        }
+      });
+
+      return {
+        data: response.data.data || [],
+        rateLimit: this.extractRateLimit(response.headers),
+        timestamp: Date.now()
+      };
+
+    } catch (error) {
+      console.error('❌ Error fetching upcoming cricket fixtures:', error.message);
+      throw error;
+    }
+  }
+
+  /**
+   * Get cricket fixture by ID with full details
+   */
+  async getCricketFixtureById(fixtureId) {
+    try {
+      const response = await this.client.get(`/v3/cricket/fixtures/${fixtureId}`, {
+        params: {
+          api_token: this.apiKey,
+          include: 'localTeam,visitorTeam,score,balls,league,scoreboards'
+        }
+      });
+
+      return {
+        data: response.data.data,
+        rateLimit: this.extractRateLimit(response.headers),
+        timestamp: Date.now()
+      };
+
+    } catch (error) {
+      console.error(`❌ Error fetching cricket fixture ${fixtureId}:`, error.message);
+      throw error;
+    }
+  }
+
+  /**
+   * Get cricket live scores with full includes
+   */
+  async getCricketLiveScoresFull() {
+    try {
+      const response = await this.client.get('/v3/cricket/livescores', {
+        params: {
+          api_token: this.apiKey,
+          include: 'localTeam,visitorTeam,score,balls,league,scoreboards',
+          per_page: 100
+        }
+      });
+
+      return {
+        data: response.data.data || [],
+        rateLimit: this.extractRateLimit(response.headers),
+        timestamp: Date.now()
+      };
+
+    } catch (error) {
+      console.error('❌ Error fetching cricket live scores full:', error.message);
+      throw error;
+    }
+  }
+
+  /**
    * Get fixture details
    */
   async getFixtureDetails(fixtureId) {

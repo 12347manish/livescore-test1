@@ -312,6 +312,35 @@ class CacheService {
   }
 
   /**
+   * Generic get - retrieve any cached value by key
+   */
+  async get(key) {
+    try {
+      const cached = await redis.get(key);
+      if (cached) {
+        return JSON.parse(cached);
+      }
+      return null;
+    } catch (error) {
+      console.error(`Error reading cache key "${key}":`, error.message);
+      return null;
+    }
+  }
+
+  /**
+   * Generic set - store any value with TTL in seconds
+   */
+  async set(key, data, ttl) {
+    try {
+      await redis.setex(key, ttl, JSON.stringify(data));
+      return true;
+    } catch (error) {
+      console.error(`Error writing cache key "${key}":`, error.message);
+      return false;
+    }
+  }
+
+  /**
    * Get cache statistics
    */
   async getCacheStats() {
